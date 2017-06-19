@@ -39,11 +39,26 @@ function typeform_fetch_data() {
     }
 
     $fields = json_decode(get_option('field_map'));
+    $anon_filter = json_decode(get_option('anon_filter'));
 
     $view_data;
     foreach ($response['responses'] as $value) {
         $answers = $value['answers'];
         $tmpl_map = [];
+
+        if (!isset($anon_filter))
+            goto NO_ANON_FILTER;
+
+        foreach ($anon_filter as $key=>$value) {
+            if (!isset($answers[$key]))
+                continue;
+
+            if ($answers[$key] == $value)
+                continue 2;
+        }
+
+        NO_ANON_FILTER:
+
         foreach ($fields as $key=>$value) {
             if (isset($answers[$key]))
                 $tmpl_map[$value] = $answers[$key];
@@ -104,6 +119,10 @@ function typeform_get_settings() {
                 'title' => 'Form ID',
                 'description' => 'The unique form ID',
                 'form' => 'text'],
+            ['option'=>'anon_filter',
+                'title' => 'Make entry anonymous',
+                'description' => 'Json of field id\'s and value to ban',
+                'form' => 'textarea'],
             ['option'=>'field_map',
                 'title' => 'Field map',
                 'description' => 'Json of fields and headlines',
