@@ -60,10 +60,12 @@ function typeform_fetch_data() {
         NO_ANON_FILTER:
 
         foreach ($fields as $key=>$value) {
-            if (isset($answers[$key]))
+
+            if (isset($answers[$key])) {
                 $tmpl_map[$value] = $answers[$key];
+                $view_data[] = typeform_parse_view_template($tmpl_map);
+	    }
         }
-        $view_data[] = typeform_parse_view_template($tmpl_map);
     }
     typeform_tmpl('view', ['responses'=>$view_data]);
 }
